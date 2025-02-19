@@ -156,19 +156,31 @@ final class PersonInfoViewController: UIViewController {
         guard childrenArray.count < 5 else { return }
         
         let childView = ChildView()
-        childView.onDelete = { [weak self, weak childView] in
-            guard let self = self, let childView = childView else { return }
+        
+        let separator = UIView()
+        separator.backgroundColor = .lightGray
+        separator.heightAnchor.constraint(equalToConstant: 1).isActive = true
+        
+        childView.onDelete = { [weak self, weak childView, weak separator] in
+            guard let self = self, let childView = childView, let separator = separator else { return }
             self.childrenArray.removeAll { $0 == childView }
             self.childrenStackView.removeArrangedSubview(childView)
+            self.childrenStackView.removeArrangedSubview(separator)
             childView.removeFromSuperview()
+            separator.removeFromSuperview()
             self.updateAddChildButtonVisibility()
         }
         
         childrenArray.append(childView)
-        childrenStackView.addArrangedSubview(childView)
         
+        if !childrenStackView.arrangedSubviews.isEmpty {
+            childrenStackView.addArrangedSubview(separator)
+        }
+        
+        childrenStackView.addArrangedSubview(childView)
         updateAddChildButtonVisibility()
     }
+
     
     private func updateAddChildButtonVisibility() {
         addChildButton.isHidden = childrenArray.count >= 5
